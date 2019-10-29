@@ -1,4 +1,4 @@
-package com.atguigu.gmall.sms.config;
+package com.atguigu.gmall.ums.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

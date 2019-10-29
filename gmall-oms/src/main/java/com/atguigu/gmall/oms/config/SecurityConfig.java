@@ -1,10 +1,8 @@
-package com.atguigu.gmall.pms.config;
+package com.atguigu.gmall.oms.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-
-import javax.annotation.security.PermitAll;
 
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
