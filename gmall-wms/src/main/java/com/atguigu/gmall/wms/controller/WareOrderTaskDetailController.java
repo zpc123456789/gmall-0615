@@ -24,7 +24,7 @@ import com.atguigu.gmall.wms.service.WareOrderTaskDetailService;
  *
  * @author lixianfeng
  * @email lxf@atguigu.com
- * @date 2019-10-28 16:30:21
+ * @date 2019-10-29 17:39:28
  */
 @Api(tags = "库存工作单 管理")
 @RestController
