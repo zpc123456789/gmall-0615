@@ -6,6 +6,7 @@ import com.atguigu.core.bean.Resp;
 import com.atguigu.gmall.pms.entity.AttrGroupEntity;
 import com.atguigu.gmall.pms.service.AttrGroupService;
 import com.atguigu.gmall.pms.vo.AttrGroupVO;
+import com.atguigu.gmall.pms.vo.GroupVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,10 +31,16 @@ public class AttrGroupController {
     @Autowired
     private AttrGroupService attrGroupService;
 
+    @GetMapping("item/group/{cid}/{spuId}")
+    public Resp<List<GroupVO>> queryGroupVOByCid(@PathVariable("cid")Long cid,@PathVariable("spuId")Long spuId){
+        List<GroupVO> groupVOS = this.attrGroupService.queryGroupVOByCid(cid,spuId);
+        return Resp.ok(groupVOS);
+    }
+
 
     @GetMapping("withattrs/cat/{catId}")
 
-    public Resp<List<AttrGroupVO>> queryGroupWithAttrsByCid(@RequestParam("catId")Long catId){
+    public Resp<List<AttrGroupVO>> queryGroupWithAttrsByCid(@PathVariable("catId")Long catId){
 
        List<AttrGroupVO> groupVOS = this.attrGroupService.queryGroupWithAttrsByCid(catId);
 

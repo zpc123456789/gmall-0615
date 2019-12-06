@@ -1,11 +1,11 @@
 package com.atguigu.gmall.pms.service;
 
-import com.atguigu.gmall.pms.vo.AttrGroupVO;
-import com.baomidou.mybatisplus.extension.service.IService;
-import com.atguigu.gmall.pms.entity.AttrGroupEntity;
 import com.atguigu.core.bean.PageVo;
 import com.atguigu.core.bean.QueryCondition;
-import org.springframework.stereotype.Service;
+import com.atguigu.gmall.pms.entity.AttrGroupEntity;
+import com.atguigu.gmall.pms.vo.AttrGroupVO;
+import com.atguigu.gmall.pms.vo.GroupVO;
+import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ import java.util.List;
  * @email lxf@atguigu.com
  * @date 2019-10-28 16:25:31
  */
-@Service
+
 public interface AttrGroupService extends IService<AttrGroupEntity> {
 
     PageVo queryPage(QueryCondition params);
@@ -28,5 +28,7 @@ public interface AttrGroupService extends IService<AttrGroupEntity> {
 
 
     List<AttrGroupVO> queryGroupWithAttrsByCid(Long catId);
+
+    List<GroupVO> queryGroupVOByCid(Long cid,Long spuId);
 }
 

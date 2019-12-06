@@ -16,6 +16,7 @@
 
     <properties>
         <java.version>1.8</java.version>
+        <mysql.version>5.1.46</mysql.version>
     </properties>
 
     <dependencies>
@@ -24,7 +25,11 @@
             <artifactId>gmall-core</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
-
+        <!--<dependency>
+            <groupId>com.atguigu</groupId>
+            <artifactId>gmall-ums-interface</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
@@ -37,7 +42,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>com.atguigu</groupId>
+            <artifactId>gmall-ums-interface</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -77,5 +86,6 @@
             </plugin>
         </plugins>
     </build>
+
 
 </project>

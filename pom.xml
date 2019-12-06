@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.atguigu</groupId>
-    <artifactId>gmall-0615</artifactId>
+    <artifactId>gmall</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <description>谷粒商城</description>
     <packaging>pom</packaging>
@@ -12,6 +12,15 @@
     <modules>
         <module>gmall-core</module>
         <module>gmall-admin</module>
+        <module>gmall-sms-interface</module>
+        <module>gmall-sms-interface</module>
+        <module>gmall-sms-interface</module>
+        <module>gmall-pms-interface</module>
+        <module>gmall-wms-interface</module>
+        <module>gmall-ums-interface</module>
+        <module>gmall-car-tinterface</module>
+        <module>gmall-cart-interface</module>
+        <module>gmall-oms-interface</module>
     </modules>
 
 </project>

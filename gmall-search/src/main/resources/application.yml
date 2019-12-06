@@ -1,0 +1,16 @@
+
+server:
+  port: 8066
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+  elasticsearch:
+    jest:
+      uris: http://192.168.127.66:9200
+  rabbitmq:
+    host: 192.168.127.66
+    virtual-host: /zpc
+    username: zpc
+    password: zpc

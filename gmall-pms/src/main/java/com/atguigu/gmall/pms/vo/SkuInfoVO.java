@@ -48,12 +48,22 @@ public class SkuInfoVO extends SkuInfoEntity {
      * 减多少
      */
      private BigDecimal reducePrice;
+
+
     /**
      * 是否参与其他优惠
      */
+
+
      private Integer fullAddOther;
+
+    private BigDecimal discount;
+
+     private List<String> images;
 
 
      //销售属性
      private List<SkuSaleAttrValueEntity> saleAttrs;
+
+
 }

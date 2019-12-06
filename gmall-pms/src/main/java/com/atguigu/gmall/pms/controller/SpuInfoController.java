@@ -13,8 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
-
-
+import java.util.List;
 
 
 /**
@@ -38,6 +37,16 @@ public class SpuInfoController {
         PageVo pageVo = spuInfoService.querySpuInfoByKeyPage(catId,condition);
 
         return Resp.ok(pageVo);
+    }
+
+
+    @ApiOperation("分页查询(排序)")
+    @PostMapping("/list")
+    @PreAuthorize("hasAuthority('pms:spuinfo:list')")
+    public Resp<List<SpuInfoEntity>> querySpuPage(@RequestBody QueryCondition queryCondition) {
+        PageVo page = spuInfoService.queryPage(queryCondition);
+
+        return Resp.ok((List<SpuInfoEntity>)page.getList());
     }
 
 

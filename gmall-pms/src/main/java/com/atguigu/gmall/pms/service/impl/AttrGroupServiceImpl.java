@@ -6,11 +6,14 @@ import com.atguigu.core.bean.QueryCondition;
 import com.atguigu.gmall.pms.dao.AttrAttrgroupRelationDao;
 import com.atguigu.gmall.pms.dao.AttrDao;
 import com.atguigu.gmall.pms.dao.AttrGroupDao;
+import com.atguigu.gmall.pms.dao.ProductAttrValueDao;
 import com.atguigu.gmall.pms.entity.AttrAttrgroupRelationEntity;
 import com.atguigu.gmall.pms.entity.AttrEntity;
 import com.atguigu.gmall.pms.entity.AttrGroupEntity;
+import com.atguigu.gmall.pms.entity.ProductAttrValueEntity;
 import com.atguigu.gmall.pms.service.AttrGroupService;
 import com.atguigu.gmall.pms.vo.AttrGroupVO;
+import com.atguigu.gmall.pms.vo.GroupVO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -30,6 +33,8 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
     private AttrAttrgroupRelationDao relationDao;
     @Autowired
     private AttrDao attrDao;
+    @Autowired
+    ProductAttrValueDao productAttrValueDao;
 
 
     @Override
@@ -96,8 +101,12 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
     public List<AttrGroupVO> queryGroupWithAttrsByCid(Long catId) {
 
         //根据分类查询分类下的所有组
-        List<AttrGroupEntity> groupEntities = this.list(new QueryWrapper<AttrGroupEntity>().eq("catalog_id", catId));
+        List<AttrGroupEntity> groupEntities = this.list(new QueryWrapper<AttrGroupEntity>().eq("catelog_id", catId));
 
+
+
+
+        return groupEntities.stream().map(attrGroupEntity -> this.queryGroupWithAttrs(attrGroupEntity.getAttrGroupId())).collect(Collectors.toList());
 
         //查询每个组下的所有规格参数
        /* return groupEntities.stream().map(attrGroupEntity -> {
@@ -108,12 +117,26 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
                                         //attrGroupEntity 是旧集合里的元素
                                         //AttrGroupVO   是新集合里的元素
 
-        List<AttrGroupVO> groupVOS = groupEntities.stream().map(attrGroupEntity -> this.queryGroupWithAttrs(attrGroupEntity.getAttrGroupId())).collect(Collectors.toList());
-
-
-        return groupVOS;
 
     }
+
+
+
+    @Override
+    public List<GroupVO> queryGroupVOByCid(Long cid, Long spuId) {
+        List<AttrGroupEntity> attrGroupEntities = this.list(new QueryWrapper<AttrGroupEntity>().eq("catelog_id", cid));
+        if (CollectionUtils.isEmpty(attrGroupEntities)){
+            return null;
+        }
+        return attrGroupEntities.stream().map(attrGroupEntity -> {
+            GroupVO groupVO = new GroupVO();
+            groupVO.setGroupName(attrGroupEntity.getAttrGroupName());
+            List<ProductAttrValueEntity> productAttrValueEntities = this.productAttrValueDao.queryByGidAndSpuId(spuId, attrGroupEntity.getAttrGroupId());
+            groupVO.setBaseAttrValues(productAttrValueEntities);
+            return groupVO;
+        }).collect(Collectors.toList());
+    }
+
 
 
     public AttrAttrgroupRelationDao getRelationDao() {

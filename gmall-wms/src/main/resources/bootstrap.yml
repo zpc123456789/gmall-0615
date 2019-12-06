@@ -7,4 +7,4 @@ spring:
         server-addr: 127.0.0.1:8848
         namespace: cbea55fe-212b-448f-87b8-416378419208
         group: dev
-          file-extension: yml
+        file-extension: yml

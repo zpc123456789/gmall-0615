@@ -1,29 +1,26 @@
 package com.atguigu.gmall.pms.controller;
 
-import java.util.Arrays;
-import java.util.Map;
-
-
 import com.atguigu.core.bean.PageVo;
 import com.atguigu.core.bean.QueryCondition;
 import com.atguigu.core.bean.Resp;
+import com.atguigu.gmall.pms.entity.SkuInfoEntity;
+import com.atguigu.gmall.pms.service.SkuInfoService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import com.atguigu.gmall.pms.entity.SkuInfoEntity;
-import com.atguigu.gmall.pms.service.SkuInfoService;
-
-
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
  * sku信息
  *
  * @author lixianfeng
- * @email lxf@atguigu.com
+ * @email lxf@atguigu.coms
  * @date 2019-10-28 16:25:31
  */
 @Api(tags = "sku信息 管理")
@@ -32,6 +29,14 @@ import com.atguigu.gmall.pms.service.SkuInfoService;
 public class SkuInfoController {
     @Autowired
     private SkuInfoService skuInfoService;
+
+
+    @GetMapping("{spuId}")
+    public Resp<List<SkuInfoEntity>> querySkuBySpuId(@PathVariable("spuId") Long spuId){
+
+        List<SkuInfoEntity> skuInfoEntities = this.skuInfoService.list(new QueryWrapper<SkuInfoEntity>().eq("spu_id", spuId));
+        return Resp.ok(skuInfoEntities);
+    }
 
     /**
      * 列表

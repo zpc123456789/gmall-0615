@@ -1,10 +1,12 @@
 package com.atguigu.gmall.pms.vo;
 
 import com.atguigu.gmall.pms.entity.ProductAttrValueEntity;
+import lombok.Data;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.List;
 
+@Data
 public class ProductAttrValueVO extends ProductAttrValueEntity {//相当于包装了一边
 
     public void setValueSelected(List<String> valueSelected){

@@ -3,27 +3,47 @@ package com.atguigu.gmall.pms.service.impl;
 import com.atguigu.core.bean.PageVo;
 import com.atguigu.core.bean.Query;
 import com.atguigu.core.bean.QueryCondition;
-import com.atguigu.gmall.pms.dao.SpuInfoDao;
-import com.atguigu.gmall.pms.dao.SpuInfoDescDao;
-import com.atguigu.gmall.pms.entity.SpuInfoDescEntity;
-import com.atguigu.gmall.pms.entity.SpuInfoEntity;
+import com.atguigu.gmall.pms.dao.*;
+import com.atguigu.gmall.pms.entity.*;
+import com.atguigu.gmall.pms.feign.GmallSmsClient;
 import com.atguigu.gmall.pms.service.SpuInfoService;
+import com.atguigu.gmall.pms.vo.ProductAttrValueVO;
+import com.atguigu.gmall.pms.vo.SkuInfoVO;
 import com.atguigu.gmall.pms.vo.SpuInfoVO;
+import com.atguigu.gmall.sms.vo.SaleVO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import io.seata.spring.annotation.GlobalTransactional;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 
 @Service("spuInfoService")
 public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> implements SpuInfoService {
     @Autowired
     private SpuInfoDescDao descDao;
+    @Autowired
+    private ProductAttrValueDao productAttrValueDao;
+    @Autowired
+    private SkuInfoDao skuInfoDao;
+    @Autowired
+    private SkuImagesDao skuImagesDao;
+    @Autowired
+    private SkuSaleAttrValueDao skuSaleAttrValueDao;
+    @Autowired
+    private GmallSmsClient  smsClient;
+    @Autowired
+    private AmqpTemplate amqpTemplate;
+
+
+
 
     @Override
     public PageVo queryPage(QueryCondition params) {
@@ -69,13 +89,14 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     }
 
 
+    @GlobalTransactional
     @Override
     public void bigSave(SpuInfoVO spuInfoVO) {
 
 
 // 1
         //新增spu相关的3张表
-        
+
 
         //新增spuInfo
         spuInfoVO.setCreateTime(new Date());
@@ -90,30 +111,116 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         descEntity.setSpuId(spuId);
         descEntity.setDecript(desc);
         this.descDao.insert(descEntity);
+
         //新增基本属性productAttrValue
-
-
-
+        List<ProductAttrValueVO> baseAttrs = spuInfoVO.getBaseAttrs();
+        baseAttrs.forEach(baseAttr -> {
+            baseAttr.setAttrId(spuId);
+            baseAttr.setAttrSort(0);
+            baseAttr.setQuickShow(1);
+            this.productAttrValueDao.insert(baseAttr);
+        });
 
 
 // 2
         //新增sku相关的3张表
-        //新增skuInfo
-        //新增sku的图片
-        //新增销售属性
+        List<SkuInfoVO> skus = spuInfoVO.getSkus();
+        if (CollectionUtils.isEmpty(skus)) {
+            return;
+        }
+        skus.forEach(skuInfoVO -> {
 
+            //新增skuInfo
+            SkuInfoEntity skuInfoEntity = new SkuInfoEntity();
+            BeanUtils.copyProperties(skuInfoVO, skuInfoEntity);
+            skuInfoEntity.setBrandId(spuInfoVO.getBrandId());
+            skuInfoEntity.setCatalogId(spuInfoVO.getCatalogId());
+            skuInfoEntity.setSkuCode(UUID.randomUUID().toString());
+            skuInfoEntity.setSpuId(spuId);
+            List<String> images = skuInfoVO.getImages();
 
+            //设置默认图片
+            if (!CollectionUtils.isEmpty(images)) {
+                skuInfoEntity.setSkuDefaultImg(StringUtils.isNotBlank(skuInfoEntity.getSkuDefaultImg()) ? skuInfoEntity.getSkuDefaultImg() : images.get(0));
+            }
+            this.skuInfoDao.insert(skuInfoEntity);
+            Long skuId = skuInfoEntity.getSkuId();
 
+            //新增sku的图片
+            if (!CollectionUtils.isEmpty(images)) {
 
+                images.forEach(image -> {
+                    SkuImagesEntity skuImagesEntity = new SkuImagesEntity();
+                    skuImagesEntity.setSkuId(skuId);
+                    skuImagesEntity.setDefaultImg(StringUtils.equals(image, skuInfoEntity.getSkuDefaultImg()) ? 1 : 0);
+                    skuImagesEntity.setImgSort(0);
+                    skuImagesEntity.setImgUrl(image);
+                    this.skuImagesDao.insert(skuImagesEntity);
+                });
 
+            }
+
+            //新增销售属性
+            List<SkuSaleAttrValueEntity> saleAttrs = skuInfoVO.getSaleAttrs();
+
+            if (!CollectionUtils.isEmpty(saleAttrs)) {
+                saleAttrs.forEach(saleAttr -> {
+                    saleAttr.setSkuId(skuId);
+                    saleAttr.setAttrSort(0);
+                    this.skuSaleAttrValueDao.insert(saleAttr);
+                });
+            }
 // 3
-        //新增营销相关的3张表
-        //新增积分：skuBounds
-        //新增打折信息：skuLadder
-        //新增满减信息
+            //新增营销相关的3张表  skuId
+
+            SaleVO saleVO = new SaleVO();
+            BeanUtils.copyProperties(skuInfoVO, saleVO);
+            saleVO.setSkuId(skuId);
+            this.smsClient.saveSale(saleVO);
 
 
+        });
+
+
+
+    sendMsg(spuId,"insert");
+
+        //int i = 1/0;
 
     }
+
+    private void sendMsg(Long spuId, String type){
+        Map<String,Object> map = new HashMap<>();
+        map.put("id",spuId);
+        map.put("typr",type);
+        this.amqpTemplate.convertAndSend("GMALL-TIME-EXHANGE","item" + type,map);
+    }
+
+
+
+/*
+
+        private void saveBaseAttr(SpuInfoVO spuInfoVO, Long spuId) {
+            List<ProductAttrValueVO> baseAttrs = spuInfoVO.getBaseAttrs();
+            baseAttrs.forEach(baseAttr -> {
+                baseAttr.setSpuId(spuId);
+                baseAttr.setAttrSort(0);
+                baseAttr.setQuickShow(1);
+                this.productAttrValueDao.insert(baseAttr);
+            });
+        }
+
+
+
+        private Long saveSpuInfo(SpuInfoVO spuInfoVO) {
+            spuInfoVO.setCreateTime(new Date());
+            spuInfoVO.setUodateTime(spuInfoVO.getCreateTime());
+            this.save(spuInfoVO);
+            return spuInfoVO.getId();
+        }
+*/
+
+
+
 
 }
