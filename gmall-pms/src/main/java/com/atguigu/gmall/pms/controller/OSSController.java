@@ -24,9 +24,9 @@ public class OSSController {
     //r0n61FLumL7qaAY18MQGGfFhX96Xva
 
 
-    String accessId = "LTAI4FrRp861VrvvB5Caqdga"; // 请填写您的AccessKeyId。
-    String accessKey = "r0n61FLumL7qaAY18MQGGfFhX96Xva"; // 请填写您的AccessKeySecret。
-    String endpoint = "oss-cn-shanghai.aliyuncs.com"; // 请填写您的 endpoint。
+    String accessId = " "; // 请填写您的AccessKeyId。
+    String accessKey = " "; // 请填写您的AccessKeySecret。
+    String endpoint = " "; // 请填写您的 endpoint。
     String bucket = "gmall-zpc"; // 请填写您的 bucketname 。
     String host = "https://" + bucket + "." + endpoint; // host的格式为 bucketname.endpoint
     // callbackUrl为 上传回调服务器的URL，请将下面的IP和Port配置为您自己的真实信息。
